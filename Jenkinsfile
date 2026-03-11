@@ -6,10 +6,11 @@ pipeline {
     }
 
     environment {
-        DEPLOY_DIR = 'C:\\tomcat10\\webapps'
-        TOMCAT_HOME = 'C:\\tomcat10'
-        APP_NAME = 'myapp'
-    }
+    DEPLOY_DIR = 'C:\\tomcat10\\webapps'
+    TOMCAT_HOME = 'C:\\tomcat10'
+    APP_NAME = 'myapp'
+    CATALINA_HOME = 'C:\\tomcat10'
+}
 
     stages {
 
