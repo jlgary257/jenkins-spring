@@ -2,15 +2,15 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven'  // ← must match EXACTLY what you named it in Jenkins Tools
+        maven 'Maven'
     }
 
     environment {
-    DEPLOY_DIR = 'C:\\tomcat10\\webapps'
-    TOMCAT_HOME = 'C:\\tomcat10'
-    APP_NAME = 'myapp'
-    CATALINA_HOME = 'C:\\tomcat10'
-}
+        DEPLOY_DIR = 'C:\\tomcat10\\webapps'
+        TOMCAT_HOME = 'C:\\tomcat10'
+        CATALINA_HOME = 'C:\\tomcat10'
+        APP_NAME = 'myapp'
+    }
 
     stages {
 
@@ -30,8 +30,9 @@ pipeline {
         stage('Shutdown Tomcat') {
             steps {
                 bat """
-                call %TOMCAT_HOME%\\bin\\shutdown.bat
-                timeout /t 5
+                taskkill /F /IM tomcat*.exe /T || exit 0
+                taskkill /F /FI "WINDOWTITLE eq Tomcat*" /T || exit 0
+                timeout /t 3
                 """
             }
         }
@@ -61,7 +62,7 @@ pipeline {
         }
         failure {
             echo 'Deployment failed. Attempting to restart Tomcat...'
-            bat "call %TOMCAT_HOME%\\bin\\startup.bat"
+            bat "call %TOMCAT_HOME%\\bin\\startup.bat || exit 0"
         }
     }
 }
