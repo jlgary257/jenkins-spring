@@ -1,0 +1,13 @@
+version: "2"
+
+authtoken: 3AmIaHzMgjMhcWVIdcM54MYlOfC_3mYUA2KtUHEYrYUwVPBfW
+
+tunnels:
+  jenkins:
+    addr: 8080
+    proto: http
+
+  tomcat:
+    addr: 8088
+    proto: http
+
