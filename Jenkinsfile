@@ -38,15 +38,15 @@ pipeline {
         }
 
         stage('Deploy to Tomcat') {
-            steps {
-                bat """
-                if exist "%DEPLOY_DIR%\\%APP_NAME%.war" del /F "%DEPLOY_DIR%\\%APP_NAME%.war"
-                if exist "%DEPLOY_DIR%\\%APP_NAME%" rmdir /S /Q "%DEPLOY_DIR%\\%APP_NAME%"
-                copy /Y target\\*.war "%DEPLOY_DIR%\\%APP_NAME%.war"
-                dir "%DEPLOY_DIR%"
-                """
-            }
-        }
+    steps {
+        bat """
+        if exist "%DEPLOY_DIR%\\%APP_NAME%.war" del /F "%DEPLOY_DIR%\\%APP_NAME%.war"
+        if exist "%DEPLOY_DIR%\\%APP_NAME%" rmdir /S /Q "%DEPLOY_DIR%\\%APP_NAME%"
+        copy /Y target\\%APP_NAME%.war.original "%DEPLOY_DIR%\\%APP_NAME%.war"
+        dir "%DEPLOY_DIR%"
+        """
+    }
+}
 
         stage('Start Tomcat') {
             steps {
