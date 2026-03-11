@@ -8,7 +8,7 @@ pipeline {
     environment {
         DEPLOY_DIR = 'C:\\tomcat10\\webapps'
         TOMCAT_HOME = 'C:\\tomcat10'
-        APP_NAME = 'myapp'
+        APP_NAME = 'Jenkinspring-0.0.1-SNAPSHOT'
     }
 
     stages {
