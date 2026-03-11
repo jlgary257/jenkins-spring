@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven'
+        maven 'Maven3'
     }
 
     environment {
@@ -25,14 +25,7 @@ pipeline {
             }
         }
 
-        stage('Shutdown Tomcat') {
-            steps {
-                bat """
-                call %TOMCAT_HOME%\\bin\\shutdown.bat
-                timeout /t 5
-                """
-            }
-        }
+       
 
         stage('Deploy to Tomcat') {
             steps {
@@ -44,11 +37,7 @@ pipeline {
             }
         }
 
-        stage('Start Tomcat') {
-            steps {
-                bat "call %TOMCAT_HOME%\\bin\\startup.bat"
-            }
-        }
+       
 
     }
 
