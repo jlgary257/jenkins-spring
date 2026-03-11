@@ -1,8 +1,13 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'Maven'
+    }
+
     environment {
         DEPLOY_DIR = 'C:\\tomcat10\\webapps'
+        TOMCAT_HOME = 'C:\\tomcat10'
     }
 
     stages {
@@ -21,8 +26,16 @@ pipeline {
 
         stage('Deploy to Tomcat') {
             steps {
+                bat "copy /Y target\\*.war \"%DEPLOY_DIR%\""
+            }
+        }
+
+        stage('Restart Tomcat') {
+            steps {
                 bat """
-                copy /Y target\\*.war "%DEPLOY_DIR%"
+                call %TOMCAT_HOME%\\bin\\shutdown.bat
+                timeout /t 5
+                call %TOMCAT_HOME%\\bin\\startup.bat
                 """
             }
         }
