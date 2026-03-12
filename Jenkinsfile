@@ -6,10 +6,8 @@ pipeline {
     }
 
     environment {
-        DEPLOY_DIR = 'C:\\tomcat10\\webapps'
-        TOMCAT_HOME = 'C:\\tomcat10'
-        CATALINA_HOME = 'C:\\tomcat10'
-        APP_NAME = 'myapp'
+        IMAGE_NAME = 'myapp'
+        CONTAINER_NAME = 'myapp-container'
     }
 
     stages {
@@ -23,34 +21,28 @@ pipeline {
         stage('Build WAR') {
             steps {
                 bat 'mvn clean package -DskipTests'
-                bat 'dir target\\*.war'
+                bat 'dir target\\*.war.original'
             }
         }
 
-        stage('Shutdown Tomcat') {
+        stage('Build Docker Image') {
+            steps {
+                bat "docker build -t %IMAGE_NAME% ."
+            }
+        }
+
+        stage('Stop Old Container') {
             steps {
                 bat """
-                taskkill /F /IM tomcat*.exe /T || exit 0
-                taskkill /F /FI "WINDOWTITLE eq Tomcat*" /T || exit 0
-                timeout /t 3
+                docker stop %CONTAINER_NAME% || exit 0
+                docker rm %CONTAINER_NAME% || exit 0
                 """
             }
         }
 
-        stage('Deploy to Tomcat') {
-    steps {
-        bat """
-        if exist "%DEPLOY_DIR%\\%APP_NAME%.war" del /F "%DEPLOY_DIR%\\%APP_NAME%.war"
-        if exist "%DEPLOY_DIR%\\%APP_NAME%" rmdir /S /Q "%DEPLOY_DIR%\\%APP_NAME%"
-        copy /Y target\\%APP_NAME%.war.original "%DEPLOY_DIR%\\%APP_NAME%.war"
-        dir "%DEPLOY_DIR%"
-        """
-    }
-}
-
-        stage('Start Tomcat') {
+        stage('Run Docker Container') {
             steps {
-                bat "call %TOMCAT_HOME%\\bin\\startup.bat"
+                bat "docker run -d -p 8088:8080 --name %CONTAINER_NAME% %IMAGE_NAME%"
             }
         }
 
@@ -58,11 +50,10 @@ pipeline {
 
     post {
         success {
-            echo 'Deployment completed successfully.'
+            echo 'Deployment to Docker completed successfully.'
         }
         failure {
-            echo 'Deployment failed. Attempting to restart Tomcat...'
-            bat "call %TOMCAT_HOME%\\bin\\startup.bat || exit 0"
+            echo 'Deployment failed.'
         }
     }
 }
